@@ -1,6 +1,14 @@
 import jwt from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
 
+export interface jwtdecodedinfo {
+  username: string;
+  nickname: string;
+  iat: number;
+  exp: number;
+  sub: string;
+}
+
 export function createToken(username: string, nickname: string) {
   const token = new Promise((resolve, reject) => {
     jwt.sign(

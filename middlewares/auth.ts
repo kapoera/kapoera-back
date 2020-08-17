@@ -15,7 +15,7 @@ export function authMiddleware(
     const p = new Promise((resolve, reject) => {
       jwt.verify(token, secretObj.secret, (err, decoded) => {
         if (err) return reject(err);
-        else return resolve();
+        else return resolve(decoded);
       });
     });
     return p;
@@ -29,7 +29,7 @@ export function authMiddleware(
   }
 
   auth(getToken(req.headers.authorization))
-    .then(() => {
+    .then(decoded => {
       next();
     })
     .catch(onError);

@@ -4,9 +4,9 @@ import mongoose, { createConnection } from 'mongoose';
 import cors from 'cors';
 import { User, UserType, UserModel } from './models/user';
 import { DB } from './models/db';
-import { createToken } from '../utils/jwt';
+import { createToken, jwtdecodedinfo } from '../utils/jwt';
 import { authMiddleware } from '../middlewares/auth';
-import jwt from 'jsonwebtoken';
+import jwt, { decode, VerifyErrors } from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
 
 const uri = 'mongodb://localhost/kapoera';
@@ -67,14 +67,35 @@ app.get('/auth/check', async (req: express.Request, res: express.Response) => {
   if (!req.headers.authorization) {
     res.json({ valid: false });
   } else {
-    try {
-      const token = req.headers.authorization.split(' ')[1];
-      const decoded = await promisify(jwt.verify)(token, secretObj.secret);
-
-      res.json({ valid: true, decoded });
-    } catch (err) {
-      res.json({ valid: false });
-    }
+    const token: string = req.headers.authorization.split(' ')[1];
+    new Promise<jwtdecodedinfo>((resolve, reject) => {
+      jwt.verify(
+        token,
+        secretObj.secret,
+        { algorithms: ['HS256'] },
+        (err, decoded) => {
+          if (err) return reject(err);
+          else return resolve(<jwtdecodedinfo>decoded);
+        }
+      );
+    })
+      .then((decoded: jwtdecodedinfo) => {
+        console.log(decoded);
+        db.read({ username: decoded.username })
+          .then(user => {
+            res.json({
+              valid: true,
+              userinfo: user
+            });
+          })
+          .catch(err => {
+            res.json({ valid: false });
+          });
+      })
+      .catch(err => {
+        console.log(err.message);
+        res.json({ valid: false });
+      });
   }
 });
 
