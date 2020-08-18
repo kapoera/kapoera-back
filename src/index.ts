@@ -55,11 +55,11 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
                 default_nickname: 'happyhappy'
               });
             })
-            .catch(err => console.error(err));
+            .catch(err => res.json({ success: false, message: err.message }));
         })
         .catch(err => {
           console.error(err);
-          console.log({ success: false });
+          res.json({ success: false, message: err.message });
         });
     }
   });
@@ -69,7 +69,7 @@ app.post('/auth/revoke', (req: express.Request, res: express.Response) => {
   if (!req.headers.refreshtoken) {
     res.json({ success: false, message: 'no refresh token' });
   } else {
-    if (req.headers.refreshtoken in jwtUtils.refreshTokens) {
+    if (jwtUtils.refreshTokens.includes(req.headers.refreshtoken)) {
       authUtils
         .tokenVerify(<string>req.headers.refreshtoken)
         .then(authUtils.revokeToken)
@@ -86,10 +86,12 @@ app.post('/auth/revoke', (req: express.Request, res: express.Response) => {
 app.get('/api/check', (req: express.Request, res: express.Response) => {
   db.readUser(req.body.decoded.username)
     .then(user => {
-      delete (<User>user[0]).password;
+      const userinfo = <User>user[0];
+      userinfo.password = '';
+      console.log(userinfo);
       res.json({
         success: true,
-        userinfo: <User>user[0]
+        userinfo: userinfo
       });
     })
     .catch(err => {
