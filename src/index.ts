@@ -1,17 +1,16 @@
-import { promisify } from 'util';
 import express from 'express';
 import mongoose, { createConnection } from 'mongoose';
 import cors from 'cors';
 import { User, UserType, UserModel } from './models/user';
-import { DB } from './models/db';
-import { jwtdecodedinfo, createTokens, tokens } from '../utils/jwt';
+import * as db from './models/db';
+
+import { JwtDecodedInfo, Tokens, LoginInput } from '../utils/type';
+import * as jwtUtils from '../utils/jwt';
+import * as authUtils from '../utils/auth';
 import { authMiddleware } from '../middlewares/auth';
-import jwt, { decode, VerifyErrors } from 'jsonwebtoken';
-import { secretObj } from '../config/secret';
 
 const uri = 'mongodb://localhost/kapoera';
 mongoose.connect(uri, { useNewUrlParser: true });
-const db = new DB();
 
 const app = express();
 app.use(cors());
@@ -25,81 +24,77 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
 app.post('/auth/login', (req: express.Request, res: express.Response) => {
   console.log(req.body);
-  db.read({ username: req.body.username, password: req.body.password }).then(
-    user => {
-      console.log(user);
-      if (user.length > 0) {
-        createTokens(user[0].username, user[0].nickname)
-          .then((tokens: tokens) => {
-            console.log(tokens);
-            res.json({
-              success: true,
-              accessToken: tokens.accessToken,
-              refreshToken: tokens.refreshToken,
-              is_new: false,
-              default_nickname: 'happyhappy'
-            });
-          })
-          .catch(err => console.error(err));
-      } else {
-        db.create(req.body)
-          .then(saveUser => {
-            console.log(saveUser);
-            createTokens(saveUser.username, saveUser.nickname)
-              .then((tokens: tokens) => {
-                res.json({
-                  success: true,
-                  accessToken: tokens.accessToken,
-                  refreshToken: tokens.refreshToken,
-                  is_new: true,
-                  default_nickname: 'happyhappy'
-                });
-              })
-              .catch(err => console.error(err));
-          })
-          .catch(err => {
-            console.error(err);
-            console.log({ success: false });
+  db.readUser(req.body.username).then(user => {
+    console.log(user);
+    if (user.length > 0) {
+      jwtUtils
+        .createTokens(user[0].username, user[0].nickname)
+        .then((tokens: Tokens) => {
+          console.log(tokens);
+          res.json({
+            success: true,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            is_new: false,
+            default_nickname: 'happyhappy'
           });
-      }
+        })
+        .catch(err => console.error(err));
+    } else {
+      db.createUser(<LoginInput>req.body)
+        .then(saveUser => {
+          console.log(saveUser);
+          jwtUtils
+            .createTokens(saveUser.username, saveUser.nickname)
+            .then((tokens: Tokens) => {
+              res.json({
+                success: true,
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                is_new: true,
+                default_nickname: 'happyhappy'
+              });
+            })
+            .catch(err => console.error(err));
+        })
+        .catch(err => {
+          console.error(err);
+          console.log({ success: false });
+        });
     }
-  );
+  });
 });
 
-app.get('/auth/check', async (req: express.Request, res: express.Response) => {
-  if (!req.headers.authorization) {
-    res.json({ valid: false });
+app.post('/auth/revoke', (req: express.Request, res: express.Response) => {
+  if (!req.headers.refreshtoken) {
+    res.json({ success: false, message: 'no refresh token' });
   } else {
-    const token: string = req.headers.authorization.split(' ')[1];
-    new Promise<jwtdecodedinfo>((resolve, reject) => {
-      jwt.verify(
-        token,
-        secretObj.secret,
-        { algorithms: ['HS256'] },
-        (err, decoded) => {
-          if (err) return reject(err);
-          else return resolve(<jwtdecodedinfo>decoded);
-        }
-      );
-    })
-      .then((decoded: jwtdecodedinfo) => {
-        console.log(decoded);
-        db.read({ username: decoded.username })
-          .then(user => {
-            res.json({
-              valid: true,
-              userinfo: user[0]
-            });
-          })
-          .catch(err => {
-            res.json({ valid: false });
-          });
-      })
-      .catch(err => {
-        console.log(err.message);
-        res.json({ valid: false });
-      });
+    if (req.headers.refreshtoken in jwtUtils.refreshTokens) {
+      authUtils
+        .tokenVerify(<string>req.headers.refreshtoken)
+        .then(authUtils.revokeToken)
+        .then(token => {
+          res.json({ success: true, newAccessToken: token });
+        })
+        .catch(err => res.json({ success: false, message: err.message }));
+    } else {
+      res.json({ success: false, message: 'not appropriate token' });
+    }
   }
+});
+
+app.get('/api/check', (req: express.Request, res: express.Response) => {
+  db.readUser(req.body.decoded.username)
+    .then(user => {
+      delete (<User>user[0]).password;
+      res.json({
+        success: true,
+        userinfo: <User>user[0]
+      });
+    })
+    .catch(err => {
+      res.json({ success: false, message: err.message });
+    });
 });
 
 app.post('/api/nickname', (req: express.Request, res: express.Response) => {

@@ -1,21 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
-import { response } from 'express';
-
+import { JwtDecodedInfo, Tokens } from './type';
 export let refreshTokens: Array<any> = [];
-
-export interface jwtdecodedinfo {
-  username: string;
-  nickname: string;
-  iat: number;
-  exp: number;
-  sub: string;
-}
-
-export interface tokens {
-  accessToken: string;
-  refreshToken: string;
-}
 
 export function createAccessToken(username: string, nickname: string) {
   const token = new Promise((resolve, reject) => {
@@ -50,26 +36,26 @@ export function createRefreshToken(username: string, nickname: string) {
 export const createTokens = (
   username: string,
   nickname: string
-): Promise<tokens> => {
+): Promise<Tokens> => {
   return new Promise((resolve, reject) => {
     createAccessToken(username, nickname)
       .then(accessToken => {
         createRefreshToken(username, nickname)
           .then(refreshToken => {
             refreshTokens.push(refreshToken);
-            resolve(<tokens>{
+            resolve(<Tokens>{
               accessToken: accessToken,
               refreshToken: refreshToken
             });
           })
           .catch(err => {
             console.log(err.message);
-            reject(<tokens>{ accessToken: 'fail', refreshToken: 'fail' });
+            reject(<Tokens>{ accessToken: 'fail', refreshToken: 'fail' });
           });
       })
       .catch(err => {
         console.log(err.message);
-        reject(<tokens>{ accessToken: 'fail', refreshToken: 'fail' });
+        reject(<Tokens>{ accessToken: 'fail', refreshToken: 'fail' });
       });
   });
 };

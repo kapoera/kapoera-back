@@ -1,44 +1,31 @@
 import mongoose from 'mongoose';
-
+import { LoginInput } from '../../utils/type';
 import { User, UserType, UserModel } from './user';
 
-export class DB {
-  constructor() {}
+export function readUser(
+  username: string
+): mongoose.DocumentQuery<UserType[], UserType> {
+  return UserModel.find({ username: username });
+}
 
-  read(query: any): mongoose.DocumentQuery<UserType[], UserType> {
-    return UserModel.find(query);
-  }
+export function createUser(input: LoginInput): Promise<UserType> {
+  const def = {
+    score: 500,
+    is_admin: false,
+    department: 'CS',
+    student_number: 12345678,
+    nickname: 'happyhappy'
+  };
+  const user = { ...def, ...input };
+  console.log(user);
+  const u = new UserModel(user);
+  return u.save();
+}
 
-  //   is_key_unique(key: String): Boolean {
-  //     this.read({ key: key })
-  //       .then(user => {
-  //         if (user != null) return true;
-  //         return false;
-  //       })
-  //       .catch(err => {
-  //         console.error(err);
-  //         return false;
-  //       });
-  //   }
-  create(input: any): Promise<UserType> {
-    const def = {
-      score: 500,
-      is_admin: false,
-      department: 'CS',
-      student_number: 12345678,
-      nickname: 'happyhappy'
-    };
-    const user = { ...def, ...input };
-    console.log(user);
-    const u = new UserModel(user);
-    return u.save();
-  }
+export function updateNickname(user: User): mongoose.Query<number> {
+  return UserModel.update({ score: user.score }, { ...user });
+}
 
-  updateNickname(user: User): mongoose.Query<number> {
-    return UserModel.update({ score: user.score }, { ...user });
-  }
-
-  updateScore(user: User): mongoose.Query<number> {
-    return UserModel.update({ score: user.score }, { ...user });
-  }
+export function updateScore(user: User): mongoose.Query<number> {
+  return UserModel.update({ score: user.score }, { ...user });
 }
