@@ -100,7 +100,18 @@ app.get('/api/check', (req: express.Request, res: express.Response) => {
 });
 
 app.post('/api/nickname', (req: express.Request, res: express.Response) => {
-  res.send('happy');
+  console.log(req.body.decoded.username);
+  db.readUser(req.body.decoded.username)
+    .then(user => {
+      console.log(<User>user[0]);
+      console.log(typeof req.body.nickname);
+      db.updateNickname(<User>user[0], req.body.nickname).then(() => {
+        res.json({ success: true });
+      });
+    })
+    .catch(err => {
+      res.json({ success: false, message: err.message });
+    });
 });
 
 app.listen(3000, () => console.log('start'));

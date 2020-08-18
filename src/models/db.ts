@@ -22,10 +22,9 @@ export function createUser(input: LoginInput): Promise<UserType> {
   return u.save();
 }
 
-export function updateNickname(user: User): mongoose.Query<number> {
-  return UserModel.update({ score: user.score }, { ...user });
-}
-
-export function updateScore(user: User): mongoose.Query<number> {
-  return UserModel.update({ score: user.score }, { ...user });
+export function updateNickname(
+  user: User,
+  nickname: string
+): mongoose.Query<number> {
+  return UserModel.update({ username: user.username }, { nickname: nickname });
 }
