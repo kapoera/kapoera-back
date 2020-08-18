@@ -4,7 +4,7 @@ import mongoose, { createConnection } from 'mongoose';
 import cors from 'cors';
 import { User, UserType, UserModel } from './models/user';
 import { DB } from './models/db';
-import { createToken, jwtdecodedinfo } from '../utils/jwt';
+import { jwtdecodedinfo, createTokens, tokens } from '../utils/jwt';
 import { authMiddleware } from '../middlewares/auth';
 import jwt, { decode, VerifyErrors } from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
@@ -28,26 +28,29 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
   db.read({ username: req.body.username, password: req.body.password }).then(
     user => {
       console.log(user);
-      if (user.length > 0)
-        createToken(user[0].username, user[0].nickname)
-          .then(token => {
+      if (user.length > 0) {
+        createTokens(user[0].username, user[0].nickname)
+          .then((tokens: tokens) => {
+            console.log(tokens);
             res.json({
               success: true,
-              token: token,
+              accessToken: tokens.accessToken,
+              refreshToken: tokens.refreshToken,
               is_new: false,
               default_nickname: 'happyhappy'
             });
           })
           .catch(err => console.error(err));
-      else {
+      } else {
         db.create(req.body)
           .then(saveUser => {
             console.log(saveUser);
-            createToken(saveUser.username, saveUser.nickname)
-              .then(token => {
+            createTokens(saveUser.username, saveUser.nickname)
+              .then((tokens: tokens) => {
                 res.json({
                   success: true,
-                  token: token,
+                  accessToken: tokens.accessToken,
+                  refreshToken: tokens.refreshToken,
                   is_new: true,
                   default_nickname: 'happyhappy'
                 });
@@ -85,7 +88,7 @@ app.get('/auth/check', async (req: express.Request, res: express.Response) => {
           .then(user => {
             res.json({
               valid: true,
-              userinfo: user
+              userinfo: user[0]
             });
           })
           .catch(err => {

@@ -1,13 +1,14 @@
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import express from 'express';
 import { secretObj } from '../config/secret';
+import { refreshTokens, jwtdecodedinfo, createAccessToken } from '../utils/jwt';
 
 export function authMiddleware(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) {
-  function getToken(param: any) {
+  function getAccessToken(param: any): string {
     if (param) return param.split(' ')[1];
     else return '';
   }
@@ -21,6 +22,41 @@ export function authMiddleware(
     return p;
   }
 
+  function getRefreshToken(param: any): string {
+    if (param) return param.split(' ')[2];
+    else return '';
+  }
+
+  function check_expired(error: Error): Promise<jwtdecodedinfo> {
+    if (error.message == 'jwt expired') {
+      const refreshToken = getRefreshToken(req.headers.authorization);
+      if (refreshToken in refreshTokens) {
+        return new Promise((resolve, reject) => {
+          jwt.verify(refreshToken, secretObj.secret, (err, decoded) => {
+            if (err) return reject(err);
+            else {
+              return resolve(<jwtdecodedinfo>decoded);
+            }
+          });
+        });
+      } else {
+        return new Promise((res, rej) => {
+          rej(new Error('not existing refresh token'));
+        });
+      }
+    } else
+      return new Promise((res, rej) => {
+        rej(new Error('not existing refresh token'));
+      });
+  }
+
+  function revokeToken(decoded: jwtdecodedinfo) {
+    res.json({
+      success: true,
+      newAccessToken: createAccessToken(decoded.username, decoded.nickname)
+    });
+  }
+
   function onError(error: Error) {
     res.status(403).json({
       success: false,
@@ -28,9 +64,15 @@ export function authMiddleware(
     });
   }
 
-  auth(getToken(req.headers.authorization))
+  auth(getAccessToken(req.headers.authorization))
     .then(decoded => {
       next();
     })
-    .catch(onError);
+    .catch(err => {
+      check_expired(err)
+        .then(decoded_refresh => {
+          revokeToken(decoded_refresh);
+        })
+        .catch(onError);
+    });
 }
