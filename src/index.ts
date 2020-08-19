@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import mongoose, { createConnection } from 'mongoose';
 import cors from 'cors';
-import { router } from '../routes/index';
+import router from '../routes';
 const uri = 'mongodb://localhost/kapoera';
 mongoose.connect(uri, { useNewUrlParser: true });
 
