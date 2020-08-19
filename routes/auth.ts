@@ -58,7 +58,7 @@ router.post('/token', (req: express.Request, res: express.Response) => {
         .tokenVerify(<string>req.headers.refreshtoken)
         .then(authUtils.revokeToken)
         .then(token => {
-          res.json({ success: true, newAccessToken: token });
+          res.json({ success: true, accessToken: token });
         })
         .catch(err => res.json({ success: false, message: err.message }));
     } else {

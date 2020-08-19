@@ -5,7 +5,7 @@ import { User } from '../src/models/user';
 
 const router = express.Router();
 
-router.use('/', authMiddleware);
+router.use(authMiddleware);
 
 router.get('/check', (req: express.Request, res: express.Response) => {
   db.readUser(req.body.decoded.username)
