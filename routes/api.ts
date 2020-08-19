@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.get('/check', (req: express.Request, res: express.Response) => {
   db.readUser(req.body.decoded.username)
     .then(users => {
-      const { password, ...userinfo } = users[0].toObject();
+      const { _id, __v, password, ...userinfo } = users[0].toObject();
       res.json({
         success: true,
         userinfo
