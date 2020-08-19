@@ -74,13 +74,11 @@ router.post('/auth/revoke', (req: express.Request, res: express.Response) => {
 
 router.get('/api/check', (req: express.Request, res: express.Response) => {
   db.readUser(req.body.decoded.username)
-    .then(user => {
-      const userinfo = <User>user[0];
-      userinfo.password = '';
-      console.log(userinfo);
+    .then(users => {
+      const { password, ...userinfo } = users[0].toObject();
       res.json({
         success: true,
-        userinfo: userinfo
+        userinfo
       });
     })
     .catch(err => {
