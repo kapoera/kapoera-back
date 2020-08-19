@@ -8,7 +8,7 @@ export function createAccessToken(username: string, nickname: string) {
     jwt.sign(
       { username: username, nickname: nickname },
       secretObj.secret,
-      { expiresIn: '15m', subject: 'userinfo', algorithm: 'HS256' },
+      { expiresIn: '15m', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
         resolve(token);
@@ -23,7 +23,7 @@ export function createRefreshToken(username: string, nickname: string) {
     jwt.sign(
       { username: username, nickname: nickname },
       secretObj.secret,
-      { expiresIn: '14d', subject: 'userinfo', algorithm: 'HS256' },
+      { expiresIn: '14d', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
         resolve(token);
