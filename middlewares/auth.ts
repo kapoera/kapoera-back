@@ -24,7 +24,7 @@ export function authMiddleware(
   }
 
   function onError(error: Error) {
-    if (error.message == 'jwt expired') {
+    if (error.message === 'jwt expired') {
       res.json({
         success: false,
         isExpired: true,
