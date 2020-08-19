@@ -49,7 +49,7 @@ router.post('/login', (req: express.Request, res: express.Response) => {
   });
 });
 
-router.post('/revoke', (req: express.Request, res: express.Response) => {
+router.post('/token', (req: express.Request, res: express.Response) => {
   if (!req.headers.refreshtoken) {
     res.json({ success: false, message: 'no refresh token' });
   } else {
@@ -62,7 +62,7 @@ router.post('/revoke', (req: express.Request, res: express.Response) => {
         })
         .catch(err => res.json({ success: false, message: err.message }));
     } else {
-      res.json({ success: false, message: 'not routerropriate token' });
+      res.json({ success: false, message: 'not appropriate token' });
     }
   }
 });
