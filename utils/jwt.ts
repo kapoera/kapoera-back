@@ -1,25 +1,30 @@
 import jwt from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
-import { JwtDecodedInfo, Tokens } from './type';
-export let refreshTokens: Array<any> = [];
+import { Tokens } from './type';
+export const refreshTokens: Array<any> = [];
 
-export function createAccessToken(username: string, nickname: string) {
-  const token = new Promise((resolve, reject) => {
+export const createAccessToken = (
+  username: string,
+  nickname: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
     jwt.sign(
       { username: username, nickname: nickname },
       secretObj.secret,
-      { expiresIn: '15m', algorithm: 'HS256' },
+      { expiresIn: '1m', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
         resolve(token);
       }
     );
   });
-  return token;
-}
+};
 
-export function createRefreshToken(username: string, nickname: string) {
-  const token = new Promise((resolve, reject) => {
+export const createRefreshToken = (
+  username: string,
+  nickname: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
     jwt.sign(
       { username: username, nickname: nickname },
       secretObj.secret,
@@ -30,8 +35,7 @@ export function createRefreshToken(username: string, nickname: string) {
       }
     );
   });
-  return token;
-}
+};
 
 export const createTokens = (
   username: string,
