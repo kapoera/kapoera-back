@@ -6,7 +6,7 @@ import router from '../routes';
 import { JwtDecodedInfo } from '../utils/type';
 
 const uri = 'mongodb://localhost/kapoera';
-mongoose.connect(uri, { useNewUrlParser: true });
+mongoose.connect(uri, { useNewUrlParser: true, useFindAndModify: false });
 
 declare module 'express-serve-static-core' {
   interface Request {
