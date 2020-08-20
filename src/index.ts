@@ -1,14 +1,24 @@
-import express from 'express';
-import mongoose from 'mongoose';
+import express, { Router } from 'express';
+import mongoose, { createConnection } from 'mongoose';
+import morgan from 'morgan';
 import cors from 'cors';
-import { router } from '../routes/index';
+import router from '../routes';
+import { JwtDecodedInfo } from '../utils/type';
+
 const uri = 'mongodb://localhost/kapoera';
 mongoose.connect(uri, { useNewUrlParser: true });
+
+declare module 'express-serve-static-core' {
+  interface Request {
+    decoded: JwtDecodedInfo;
+  }
+}
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(morgan('combined'));
 
 app.use('/', router);
 
