@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get('/check', (req: express.Request, res: express.Response) => {
-  db.readUser(req.body.decoded.username)
+  db.readUser(req.decoded.username)
     .then(users => {
       const { _id, __v, password, ...userinfo } = users[0].toObject();
       res.json({
@@ -22,12 +22,11 @@ router.get('/check', (req: express.Request, res: express.Response) => {
 });
 
 router.post('/nickname', (req: express.Request, res: express.Response) => {
-  console.log(req.body.decoded.username);
-  db.readUser(req.body.decoded.username)
-    .then(user => {
-      console.log(<User>user[0]);
+  db.readUser(req.decoded.username)
+    .then(users => {
+      console.log(<User>users[0]);
       console.log(typeof req.body.nickname);
-      db.updateNickname(<User>user[0], req.body.nickname).then(() => {
+      db.updateNickname(<User>users[0], req.body.nickname).then(() => {
         res.json({ success: true });
       });
     })
