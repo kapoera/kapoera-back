@@ -19,13 +19,15 @@ router.post('/auth/login', (req: express.Request, res: express.Response) => {
       jwtUtils
         .createTokens(user[0].username, user[0].nickname)
         .then((tokens: Tokens) => {
+          const userinfo = <User>user[0];
           console.log(tokens);
           res.json({
             success: true,
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             is_new: false,
-            default_nickname: 'hrouteryhroutery'
+            default_nickname: 'hrouteryhroutery',
+            userinfo: userinfo
           });
         })
         .catch(err => console.error(err));
@@ -33,6 +35,7 @@ router.post('/auth/login', (req: express.Request, res: express.Response) => {
       db.createUser(<LoginInput>req.body)
         .then(saveUser => {
           console.log(saveUser);
+          const userinfo = <User>saveUser;
           jwtUtils
             .createTokens(saveUser.username, saveUser.nickname)
             .then((tokens: Tokens) => {
@@ -41,7 +44,8 @@ router.post('/auth/login', (req: express.Request, res: express.Response) => {
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
                 is_new: true,
-                default_nickname: 'hrouteryhroutery'
+                default_nickname: 'hrouteryhroutery',
+                userinfo: userinfo
               });
             })
             .catch(err => res.json({ success: false, message: err.message }));
@@ -67,7 +71,7 @@ router.post('/auth/revoke', (req: express.Request, res: express.Response) => {
         })
         .catch(err => res.json({ success: false, message: err.message }));
     } else {
-      res.json({ success: false, message: 'not routerropriate token' });
+      res.json({ success: false, message: 'not appropriate token' });
     }
   }
 });

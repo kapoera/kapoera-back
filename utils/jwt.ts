@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { secretObj } from '../config/secret';
-import { JwtDecodedInfo, Tokens } from './type';
+import { Tokens } from './type';
 export let refreshTokens: Array<any> = [];
 
 export function createAccessToken(username: string, nickname: string) {
