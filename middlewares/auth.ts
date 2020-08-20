@@ -1,7 +1,6 @@
-import jwt, { decode } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import express from 'express';
 import { secretObj } from '../config/secret';
-import { refreshTokens, createAccessToken } from '../utils/jwt';
 import { JwtDecodedInfo } from '../utils/type';
 
 export function authMiddleware(
@@ -27,16 +26,9 @@ export function authMiddleware(
   }
 
   function onError(error: Error) {
-    if (error.message === 'jwt expired') {
-      res.json({
-        success: false,
-        isExpired: true,
-        message: error.message
-      });
-    }
     res.status(403).json({
       success: false,
-      isExpired: false,
+      expired: error.message === 'jwt expired',
       message: error.message
     });
   }
