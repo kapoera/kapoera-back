@@ -35,18 +35,6 @@ const router = express.Router();
  *       accessToken:
  *         type: string
  *         description: 로그인에 필요한 accessToken
- *       refreshToken
- *         type: string
- *         description: accessToken 재발급에 필요한 refreshToken
- *       is_new
- *         type: boolean
- *         description: 처음 방문한 유저인지 아닌지 판별하기 위한 값
- *       userinfo
- *         type: object
- *         description: auth 요청한 유저에 대한 정보
- *       default_nickname
- *         type: string
- *         description: 기본으로 발급하는 닉네임
  *   Response_error:
  *     type: object
  *     required:
@@ -91,7 +79,7 @@ const router = express.Router();
  *            description: "로그인 성공한 유저에 대한 응답"
  *            schema:
  *              $ref: "#/definitions/Auth_response"
- *          200:
+ *          403:
  *            description: "로그인 실패한 유저에 대한 에러메시지"
  *            schema:
  *              $ref: "#/definitions/Response_error"
@@ -168,7 +156,7 @@ router.post('/login', (req: express.Request, res: express.Response) => {
  *            description: "새로 발급한 accesstoken"
  *            schema:
  *              $ref: "#/definitions/Auth_response"
- *          200:
+ *          403:
  *            description: "잘못된 재발급 토큰을 보낸 유저에 대한 에러메시지"
  *            schema:
  *              $ref: "#/definitions/Response_error"
@@ -192,3 +180,16 @@ router.post('/token', (req: express.Request, res: express.Response) => {
 });
 
 export default router;
+
+// *       refreshToken
+// *         type: string
+// *         description: accessToken 재발급에 필요한 refreshToken
+// *       is_new
+// *         type: boolean
+// *         description: 처음 방문한 유저인지 아닌지 판별하기 위한 값
+// *       userinfo
+// *         type: object
+// *         description: auth 요청한 유저에 대한 정보
+// *       default_nickname
+// *         type: string
+// *         description: 기본으로 발급하는 닉네임

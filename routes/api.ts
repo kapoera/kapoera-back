@@ -70,7 +70,7 @@ router.use(authMiddleware);
  *            description: "로그인이 되어있는 유저에 대한 유저 정보"
  *            schema:
  *              $ref: "#/definitions/Api_response"
- *          200:
+ *          403:
  *            description: "로그인이 되어있지 않은 유저에 대한 에러메시지"
  *            schema:
  *              $ref: "#/definitions/Response_error"
@@ -121,7 +121,7 @@ router.get('/check', (req: express.Request, res: express.Response) => {
  *            description: "로그인이 되어있는 유저에 대한 요청 성공"
  *            schema:
  *              $ref: "#/definitions/Api_response"
- *          200:
+ *          403:
  *            description: "로그인이 되어있지 않은 유저에 대한 에러메시지"
  *            schema:
  *              $ref: "#/definitions/Response_error"
