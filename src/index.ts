@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import cors from 'cors';
 import router from '../routes';
 import { JwtDecodedInfo } from '../utils/type';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from '../utils/swagger';
 
 const uri = 'mongodb://localhost/kapoera';
 mongoose.connect(uri, { useNewUrlParser: true });
@@ -21,5 +23,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan('combined'));
 
 app.use('/', router);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(3000, () => console.log('start'));
