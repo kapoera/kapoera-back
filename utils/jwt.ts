@@ -12,7 +12,7 @@ export const createAccessToken = (
     jwt.sign(
       { username: username, nickname: nickname },
       secretObj.secret,
-      { expiresIn: '1m', algorithm: 'HS256' },
+      { expiresIn: '15m', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
         resolve(token);

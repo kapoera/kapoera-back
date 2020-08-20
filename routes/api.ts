@@ -1,7 +1,7 @@
 import express from 'express';
 import { authMiddleware } from '../middlewares/auth';
 import * as db from '../src/models/db';
-import { User } from '../src/models/user';
+import { UserModel } from '../src/models/user';
 
 const router = express.Router();
 
@@ -21,16 +21,24 @@ router.get('/check', (req: express.Request, res: express.Response) => {
     });
 });
 
-router.post('/nickname', (req: express.Request, res: express.Response) => {
-  db.readUser(req.decoded.username)
-    .then(users => {
-      db.updateNickname(<User>users[0], req.body.nickname).then(() => {
+router.post(
+  '/nickname',
+  async (req: express.Request, res: express.Response) => {
+    const { username } = req.decoded;
+    const { nickname } = req.body;
+
+    const exists = await UserModel.exists({ nickname });
+    if (exists) {
+      res.json({ success: false, message: 'nickname taken' });
+    } else {
+      try {
+        await UserModel.findOneAndUpdate({ username }, { nickname });
         res.json({ success: true });
-      });
-    })
-    .catch(err => {
-      res.json({ success: false, message: err.message });
-    });
-});
+      } catch (error) {
+        res.json({ success: false, message: error.message });
+      }
+    }
+  }
+);
 
 export default router;
