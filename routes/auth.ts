@@ -18,7 +18,6 @@ router.post('/login', (req: express.Request, res: express.Response) => {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             is_new: false,
-            default_nickname: 'hrouteryhroutery',
             userinfo: userinfo
           });
         })
@@ -35,7 +34,6 @@ router.post('/login', (req: express.Request, res: express.Response) => {
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
                 is_new: true,
-                default_nickname: 'hrouteryhroutery',
                 userinfo: userinfo
               });
             })
