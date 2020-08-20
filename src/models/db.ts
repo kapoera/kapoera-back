@@ -17,7 +17,6 @@ export function createUser(input: LoginInput): Promise<UserType> {
     nickname: 'happyhappy'
   };
   const user = { ...def, ...input };
-  console.log(user);
   const u = new UserModel(user);
   return u.save();
 }

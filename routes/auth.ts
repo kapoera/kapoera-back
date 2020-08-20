@@ -7,15 +7,12 @@ import * as db from '../src/models/db';
 const router = express.Router();
 
 router.post('/login', (req: express.Request, res: express.Response) => {
-  console.log(req.body);
   db.readUser(req.body.username).then(user => {
-    console.log(user);
     const { _id, __v, password, ...userinfo } = user[0].toObject();
     if (user.length > 0) {
       jwtUtils
         .createTokens(user[0].username, user[0].nickname)
         .then((tokens: Tokens) => {
-          console.log(tokens);
           res.json({
             success: true,
             accessToken: tokens.accessToken,
@@ -29,7 +26,6 @@ router.post('/login', (req: express.Request, res: express.Response) => {
     } else {
       db.createUser(<LoginInput>req.body)
         .then(saveUser => {
-          console.log(saveUser);
           const { _id, __v, password, ...userinfo } = saveUser.toObject();
           jwtUtils
             .createTokens(saveUser.username, saveUser.nickname)
@@ -46,7 +42,6 @@ router.post('/login', (req: express.Request, res: express.Response) => {
             .catch(err => res.json({ success: false, message: err.message }));
         })
         .catch(err => {
-          console.error(err);
           res.json({ success: false, message: err.message });
         });
     }

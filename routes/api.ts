@@ -24,8 +24,6 @@ router.get('/check', (req: express.Request, res: express.Response) => {
 router.post('/nickname', (req: express.Request, res: express.Response) => {
   db.readUser(req.decoded.username)
     .then(users => {
-      console.log(<User>users[0]);
-      console.log(typeof req.body.nickname);
       db.updateNickname(<User>users[0], req.body.nickname).then(() => {
         res.json({ success: true });
       });

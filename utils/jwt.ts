@@ -54,12 +54,10 @@ export const createTokens = (
             });
           })
           .catch(err => {
-            console.log(err.message);
             reject(<Tokens>{ accessToken: 'fail', refreshToken: 'fail' });
           });
       })
       .catch(err => {
-        console.log(err.message);
         reject(<Tokens>{ accessToken: 'fail', refreshToken: 'fail' });
       });
   });
