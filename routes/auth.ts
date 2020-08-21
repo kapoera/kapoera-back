@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post('/login', (req: express.Request, res: express.Response) => {
   db.readUser(req.body.username).then(user => {
-    const { _id, __v, password, ...userinfo } = user[0].toObject();
     if (user.length > 0) {
+      const { _id, __v, password, ...userinfo } = user[0].toObject();
       jwtUtils
         .createTokens(userinfo.username, userinfo.nickname)
         .then((tokens: Tokens) => {
@@ -25,6 +25,7 @@ router.post('/login', (req: express.Request, res: express.Response) => {
     } else {
       db.createUser(<LoginInput>req.body)
         .then(saveUser => {
+          const { _id, __v, password, ...userinfo } = saveUser.toObject();
           jwtUtils
             .createTokens(saveUser.username, saveUser.nickname)
             .then((tokens: Tokens) => {
