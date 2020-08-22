@@ -49,8 +49,9 @@ router.post('/login', (req: express.Request, res: express.Response) => {
 router.post('/token', (req: express.Request, res: express.Response) => {
   if (!req.headers.refreshtoken) {
     res.json({ success: false, message: 'no refresh token' });
-  } else if (typeof req.headers.refreshtoken === typeof new String()) {
+  } else {
     if (db.existRefreshToken(<string>req.headers.refreshtoken)) {
+      console.log('re-token-exist');
       authUtils
         .tokenVerify(<string>req.headers.refreshtoken)
         .then(authUtils.revokeToken)
@@ -61,8 +62,6 @@ router.post('/token', (req: express.Request, res: express.Response) => {
     } else {
       res.json({ success: false, message: 'not appropriate token' });
     }
-  } else {
-    res.json({ success: false, message: 'not appropriate token' });
   }
 });
 
