@@ -50,7 +50,8 @@ router.post('/token', (req: express.Request, res: express.Response) => {
   if (!req.headers.refreshtoken) {
     res.json({ success: false, message: 'no refresh token' });
   } else {
-    if (jwtUtils.refreshTokens.includes(req.headers.refreshtoken)) {
+    if (db.existRefreshToken(<string>req.headers.refreshtoken)) {
+      console.log('re-token-exist');
       authUtils
         .tokenVerify(<string>req.headers.refreshtoken)
         .then(authUtils.revokeToken)

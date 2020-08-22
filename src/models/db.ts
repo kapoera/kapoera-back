@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { LoginInput } from '../../utils/type';
 import { User, UserType, UserModel } from './user';
+import { RefreshTokenType, RefreshTokenModel } from './token';
 
 export function readUser(
   username: string
@@ -26,4 +27,13 @@ export function updateNickname(
   nickname: string
 ): mongoose.Query<number> {
   return UserModel.update({ username: user.username }, { nickname: nickname });
+}
+
+export function addRefreshToken(token: string): Promise<RefreshTokenType> {
+  const t = new RefreshTokenModel({ refreshToken: token });
+  return t.save();
+}
+
+export function existRefreshToken(token: string): Promise<boolean> {
+  return RefreshTokenModel.exists({ refreshToken: token });
 }
