@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
+import * as db from '../src/models/db';
 import { secretObj } from '../config/secret';
 import { Tokens } from './type';
-
-export const refreshTokens: Array<any> = [];
 
 export const createAccessToken = (
   username: string,
@@ -47,7 +46,7 @@ export const createTokens = (
       .then(accessToken => {
         createRefreshToken(username, nickname)
           .then(refreshToken => {
-            refreshTokens.push(refreshToken);
+            db.addRefreshToken(refreshToken);
             resolve(<Tokens>{
               accessToken: accessToken,
               refreshToken: refreshToken
