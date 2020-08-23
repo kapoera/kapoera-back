@@ -20,6 +20,14 @@ export interface Game {
   starting_time: number;
 }
 
+export interface Games {
+  quiz: Game;
+  ai: Game;
+  hacking: Game;
+  cart: Game;
+  lol: Game;
+}
+
 export type GameType = Game & mongoose.Document;
 
 const GameSchema = new mongoose.Schema({

@@ -63,3 +63,7 @@ export async function initGames(): Promise<void> {
     createGame(game.game_type, game.dividend);
   });
 }
+
+export function readGames(): mongoose.DocumentQuery<GameType[], GameType> {
+  return GameModel.find({});
+}
