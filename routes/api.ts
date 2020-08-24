@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware } from '../middlewares/auth';
 import * as db from '../src/models/db';
 import { UserModel } from '../src/models/user';
+import { GameModel, Games, GameType } from '../src/models/game';
 
 const router = express.Router();
 
@@ -40,5 +41,17 @@ router.post(
     }
   }
 );
+
+router.get('/games', async (req: express.Request, res: express.Response) => {
+  const response: any = {};
+  await db.readGames().then(games => {
+    games.forEach(game => {
+      console.log(game.toObject());
+      const key: string = game.toObject().game_type;
+      response[key] = game.toObject();
+    });
+  });
+  res.json(response);
+});
 
 export default router;

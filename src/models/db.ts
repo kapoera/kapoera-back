@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { LoginInput } from '../../utils/type';
 import { User, UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
+import { GameType, GameModel } from './game';
 
 export function readUser(
   username: string
@@ -36,4 +37,33 @@ export function addRefreshToken(token: string): Promise<RefreshTokenType> {
 
 export function existRefreshToken(token: string): Promise<boolean> {
   return RefreshTokenModel.exists({ refreshToken: token });
+}
+
+function createGame(game_type: string, dividend: number): Promise<GameType> {
+  const g = new GameModel({
+    dividend: dividend,
+    game_type: game_type
+  });
+  return g.save();
+}
+
+export async function initGames(): Promise<void> {
+  if (await GameModel.exists({})) {
+    console.log('already initialized');
+    return;
+  }
+  const games = [
+    { game_type: 'quiz', dividend: 1000 },
+    { game_type: 'ai', dividend: 1000 },
+    { game_type: 'lol', dividend: 1000 },
+    { game_type: 'cart', dividend: 1000 },
+    { game_type: 'hacking', dividend: 1000 }
+  ];
+  games.forEach(game => {
+    createGame(game.game_type, game.dividend);
+  });
+}
+
+export function readGames(): mongoose.DocumentQuery<GameType[], GameType> {
+  return GameModel.find({});
 }

@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import router from '../routes';
 import { JwtDecodedInfo } from '../utils/type';
+import * as db from './models/db';
 
 const uri = 'mongodb://localhost/kapoera';
 mongoose.connect(uri, { useNewUrlParser: true, useFindAndModify: false });
@@ -22,4 +23,5 @@ app.use(morgan('combined'));
 
 app.use('/', router);
 
+db.initGames();
 app.listen(3000, () => console.log('start'));
