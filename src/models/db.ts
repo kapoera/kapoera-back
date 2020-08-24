@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { LoginInput } from '../../utils/type';
 import { User, UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
-import { GameType, GameModel } from './game';
+import { GameType, GameModel, gameType } from './game';
 
 export function readUser(
   username: string
@@ -66,4 +66,10 @@ export async function initGames(): Promise<void> {
 
 export function readGames(): mongoose.DocumentQuery<GameType[], GameType> {
   return GameModel.find({});
+}
+
+export function readGame(
+  game_type: gameType
+): mongoose.DocumentQuery<GameType[], GameType> {
+  return GameModel.find({ game_type: game_type });
 }
