@@ -17,7 +17,7 @@ export interface Game {
   playing: playingType;
   winner?: winnerType;
   result: resultType;
-  starting_time: number;
+  starting_time: Date;
 }
 
 export interface Games {
@@ -39,7 +39,7 @@ const GameSchema = new mongoose.Schema({
   playing: { type: {} as playingType, default: 'waiting' },
   winner: { type: {} as winnerType, default: 'K' },
   result: { type: { K: Number, P: Number }, default: { K: 0, P: 0 } },
-  starting_time: { type: Number, default: 12345678 }
+  starting_time: { type: Date, default: Date.now }
 });
 
 export const GameModel = mongoose.model<GameType>('Game', GameSchema);
