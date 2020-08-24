@@ -56,7 +56,7 @@ export async function initGames(): Promise<void> {
     { game_type: 'quiz', dividend: 1000 },
     { game_type: 'ai', dividend: 1000 },
     { game_type: 'lol', dividend: 1000 },
-    { game_type: 'cart', dividend: 1000 },
+    { game_type: 'kart', dividend: 1000 },
     { game_type: 'hacking', dividend: 1000 }
   ];
   games.forEach(game => {
