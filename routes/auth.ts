@@ -11,7 +11,7 @@ router.post('/login', (req: express.Request, res: express.Response) => {
     if (user.length > 0) {
       const { _id, __v, password, ...userinfo } = user[0].toObject();
       jwtUtils
-        .createTokens(userinfo.username, userinfo.nickname)
+        .createTokens(userinfo.username)
         .then((tokens: Tokens) => {
           res.json({
             success: true,
@@ -27,7 +27,7 @@ router.post('/login', (req: express.Request, res: express.Response) => {
         .then(saveUser => {
           const { _id, __v, password, ...userinfo } = saveUser.toObject();
           jwtUtils
-            .createTokens(saveUser.username, saveUser.nickname)
+            .createTokens(saveUser.username)
             .then((tokens: Tokens) => {
               res.json({
                 success: true,

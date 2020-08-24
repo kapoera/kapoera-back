@@ -14,7 +14,7 @@ export function tokenVerify(token: string): Promise<JwtDecodedInfo> {
 
 export function revokeToken(decoded: JwtDecodedInfo): Promise<string> {
   return new Promise((resolve, reject) => {
-    createAccessToken(decoded.username, decoded.nickname)
+    createAccessToken(decoded.username)
       .then(token => {
         resolve(<string>token);
       })
