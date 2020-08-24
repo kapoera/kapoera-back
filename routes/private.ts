@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware } from '../middlewares/auth';
 import * as db from '../src/models/db';
 import { UserModel } from '../src/models/user';
+import { GameModel } from '../src/models/game';
 
 const router = express.Router();
 
@@ -40,5 +41,24 @@ router.post(
     }
   }
 );
+
+router.post('/bet', async (req: express.Request, res: express.Response) => {
+  const { username } = req.decoded;
+  const { game_type, choice } = req.body;
+
+  const user = await UserModel.findOne({ username });
+  if (user === null) return res.status(400).send('User does not exist');
+
+  const pushOption = {
+    [choice === 'K' ? 'kaist_arr' : 'postech_arr']: user._id
+  };
+
+  try {
+    await GameModel.update({ game_type }, { $addToSet: pushOption });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 export default router;
