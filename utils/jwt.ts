@@ -3,13 +3,10 @@ import * as db from '../src/models/db';
 import { secretObj } from '../config/secret';
 import { Tokens } from './type';
 
-export const createAccessToken = (
-  username: string,
-  nickname: string
-): Promise<string> => {
+export const createAccessToken = (username: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      { username: username, nickname: nickname },
+      { username },
       secretObj.secret,
       { expiresIn: '15m', algorithm: 'HS256' },
       (err, token) => {
@@ -20,13 +17,10 @@ export const createAccessToken = (
   });
 };
 
-export const createRefreshToken = (
-  username: string,
-  nickname: string
-): Promise<string> => {
+export const createRefreshToken = (username: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      { username: username, nickname: nickname },
+      { username },
       secretObj.secret,
       { expiresIn: '14d', algorithm: 'HS256' },
       (err, token) => {
@@ -37,14 +31,11 @@ export const createRefreshToken = (
   });
 };
 
-export const createTokens = (
-  username: string,
-  nickname: string
-): Promise<Tokens> => {
+export const createTokens = (username: string): Promise<Tokens> => {
   return new Promise((resolve, reject) => {
-    createAccessToken(username, nickname)
+    createAccessToken(username)
       .then(accessToken => {
-        createRefreshToken(username, nickname)
+        createRefreshToken(username)
           .then(refreshToken => {
             db.addRefreshToken(refreshToken);
             resolve(<Tokens>{
