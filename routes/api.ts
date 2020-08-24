@@ -6,16 +6,10 @@ const router = express.Router();
 
 router.use('/private', privateRouter);
 
-router.get('/games', async (req: express.Request, res: express.Response) => {
-  const response: any = {};
-  await db.readGames().then(games => {
-    games.forEach(game => {
-      console.log(game.toObject());
-      const key: string = game.toObject().game_type;
-      response[key] = game.toObject();
-    });
+router.get('/games', (req: express.Request, res: express.Response) => {
+  db.readGames().then(games => {
+    res.json(games.map(game => game.toObject()));
   });
-  res.json(response);
 });
 
 export default router;
