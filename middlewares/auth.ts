@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import express from 'express';
-import { secretObj } from '../config/secret';
 import { JwtDecodedInfo } from '../utils/type';
 import { createAccessToken } from '../utils/jwt';
 
@@ -11,10 +10,14 @@ export function authMiddleware(
 ): void {
   function auth(token: string) {
     return new Promise((resolve, reject) => {
-      jwt.verify(token, secretObj.secret, (err, decoded) => {
-        if (err) return reject(err);
-        else return resolve(decoded as JwtDecodedInfo);
-      });
+      jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'keyboard cat',
+        (err, decoded) => {
+          if (err) return reject(err);
+          else return resolve(decoded as JwtDecodedInfo);
+        }
+      );
     });
   }
 

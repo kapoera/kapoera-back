@@ -1,13 +1,12 @@
 import jwt from 'jsonwebtoken';
 import * as db from '../src/models/db';
-import { secretObj } from '../config/secret';
 import { Tokens } from './type';
 
 export const createAccessToken = (mail: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
       { mail },
-      secretObj.secret,
+      process.env.JWT_SECRET || 'keyboard cat',
       { expiresIn: '15m', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
@@ -21,7 +20,7 @@ export const createRefreshToken = (mail: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
       { mail },
-      secretObj.secret,
+      process.env.JWT_SECRET || 'keyboard cat',
       { expiresIn: '14d', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
