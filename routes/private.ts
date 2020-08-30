@@ -11,8 +11,9 @@ router.use(authMiddleware);
 router.get('/check', async (req: express.Request, res: express.Response) => {
   const { mail } = req.decoded;
   try {
-    const userinfo = await UserModel.findOne({ mail });
-    if (userinfo === null) throw Error('User not found');
+    const user = await UserModel.findOne({ mail });
+    if (user === null) throw Error('User not found');
+    const { __v, _id, ...userinfo } = user.toObject();
 
     res.json({ success: true, userinfo });
   } catch (error) {
