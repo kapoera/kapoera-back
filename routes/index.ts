@@ -59,13 +59,13 @@ router.post(
       }
 
       res.cookie('kapoera-access', accessToken, {
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
         httpOnly: true,
         secure: true
       });
 
       res.cookie('kapoera-refresh', refreshToken, {
-        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+        expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
         httpOnly: true,
         secure: true
       });
