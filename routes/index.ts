@@ -3,6 +3,8 @@ import authRouter from './auth';
 import apiRouter from './api';
 import crypto from 'crypto';
 import { SSOResult, SSODataMap, SSOUserInfo } from '../utils/type';
+import { UserModel } from '../src/models/user';
+import * as JWTUtils from '../utils/jwt';
 
 const router = express.Router();
 router.use('/auth', authRouter);
@@ -22,7 +24,7 @@ const decrypt = (encrypted: string, keySpec: Buffer, iv: Buffer) => {
 
 router.post(
   '/login/callback',
-  (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response) => {
     const { body }: { body: SSOResult } = req;
 
     const key = process.env.SSO_CLIENT_SECRET + req.session.state;
@@ -34,10 +36,46 @@ router.post(
       keySpec,
       iv
     );
+    const {
+      USER_INFO: user,
+      state
+    }: { USER_INFO: SSOUserInfo; state: string } = dataMap;
+    const { mail } = user;
 
-    const { USER_INFO: user, state } = dataMap;
+    try {
+      const { accessToken, refreshToken } = await JWTUtils.createTokens(mail);
+      const exists = await UserModel.exists({ mail });
+      const nickname = mail.substring(0, mail.length - '@kaist.ac.kr'.length);
 
-    res.redirect('https://cyberkapo20.site/signin/callback');
+      if (!exists) {
+        const defaults = {
+          score: 0,
+          is_admin: false,
+          nickname
+        };
+
+        const newUser = new UserModel({ ...defaults, ...user });
+        await newUser.save();
+      }
+
+      res.cookie('kapoera-access', accessToken, {
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        httpOnly: true,
+        secure: true
+      });
+
+      res.cookie('kapoera-refresh', refreshToken, {
+        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+        httpOnly: true,
+        secure: true
+      });
+
+      res.redirect(
+        `https://cyberkapo20.site/signin/callback?new=${!exists}&nickname=${nickname}`
+      );
+    } catch (error) {
+      res.status(500).send(error);
+    }
   }
 );
 
