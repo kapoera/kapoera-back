@@ -25,21 +25,30 @@ const decrypt = (encrypted: string, keySpec: Buffer, iv: Buffer) => {
 router.post(
   '/login/callback',
   async (req: express.Request, res: express.Response) => {
-    const { body }: { body: SSOResult } = req;
+    const {
+      body: { result, success, state }
+    }: { body: SSOResult } = req;
+
+    if (success !== 'true')
+      return res.status(500).send('Kaist SSO login failed');
+
+    if (!req.session.state || req.session.state !== state)
+      return res.status(401).send('TOKEN MISMATCH: session might be hijacked!');
 
     const key = process.env.SSO_CLIENT_SECRET + req.session.state;
+
+    let errorOccurred = false;
+    req.session.destroy(_ => {
+      errorOccurred = true;
+    });
+    if (errorOccurred)
+      return res.status(500).send('Error during session destroy attempt');
+
     const keySpec = Buffer.from(key.substring(80, 96), 'utf8');
     const iv = Buffer.from(key.substring(80, 96), 'utf8');
 
-    const { dataMap }: { dataMap: SSODataMap } = decrypt(
-      body.result,
-      keySpec,
-      iv
-    );
-    const {
-      USER_INFO: user,
-      state
-    }: { USER_INFO: SSOUserInfo; state: string } = dataMap;
+    const { dataMap }: { dataMap: SSODataMap } = decrypt(result, keySpec, iv);
+    const { USER_INFO: user }: { USER_INFO: SSOUserInfo } = dataMap;
     const { mail } = user;
 
     try {
