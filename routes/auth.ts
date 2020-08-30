@@ -61,4 +61,11 @@ router.post('/login-sso', (req: express.Request, res: express.Response) => {
   res.json({ url });
 });
 
+router.post('/logout', (req: express.Request, res: express.Response) => {
+  res.cookie('kapoera-access', '', { expires: new Date(0) });
+  res.cookie('kapoera-refresh', '', { expires: new Date(0) });
+
+  res.json({ success: true });
+});
+
 export default router;
