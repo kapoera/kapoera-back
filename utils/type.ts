@@ -1,9 +1,7 @@
 export interface JwtDecodedInfo {
-  username: string;
-  nickname: string;
+  mail: string;
   iat: number;
   exp: number;
-  sub: string;
 }
 
 export interface Tokens {

@@ -25,7 +25,7 @@ router.get('/check', (req: express.Request, res: express.Response) => {
 router.post(
   '/nickname',
   async (req: express.Request, res: express.Response) => {
-    const { username } = req.decoded;
+    const { mail } = req.decoded;
     const { nickname } = req.body;
 
     const exists = await UserModel.exists({ nickname });
@@ -33,7 +33,7 @@ router.post(
       res.json({ success: false, message: 'nickname taken' });
     } else {
       try {
-        await UserModel.findOneAndUpdate({ username }, { nickname });
+        await UserModel.findOneAndUpdate({ mail }, { nickname });
         res.json({ success: true });
       } catch (error) {
         res.json({ success: false, message: error.message });
@@ -43,10 +43,10 @@ router.post(
 );
 
 router.post('/bet', async (req: express.Request, res: express.Response) => {
-  const { username } = req.decoded;
+  const { mail } = req.decoded;
   const { game_type, choice } = req.body;
 
-  const user = await UserModel.findOne({ username });
+  const user = await UserModel.findOne({ mail });
   if (user === null) return res.status(400).send('User does not exist');
 
   const pushOption = {
