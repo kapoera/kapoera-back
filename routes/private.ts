@@ -2,7 +2,7 @@ import express from 'express';
 import { authMiddleware } from '../middlewares/auth';
 import * as db from '../src/models/db';
 import { UserModel } from '../src/models/user';
-import { GameModel } from '../src/models/game';
+import { GameModel, gameType } from '../src/models/game';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.use(authMiddleware);
 router.get('/check', (req: express.Request, res: express.Response) => {
   db.readUser(req.decoded.username)
     .then(users => {
-      const { _id, __v, password, ...userinfo } = users[0].toObject();
+      const { __v, password, ...userinfo } = users[0].toObject();
       res.json({
         success: true,
         userinfo
@@ -53,12 +53,28 @@ router.post('/bet', async (req: express.Request, res: express.Response) => {
     [choice === 'K' ? 'kaist_arr' : 'postech_arr']: user._id
   };
 
-  try {
-    await GameModel.update({ game_type }, { $addToSet: pushOption });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).send(error);
-  }
+  await db.readGame(<gameType>game_type).then(async game => {
+    const exist_k = game[0]
+      .toObject()
+      .kaist_arr.map((e: any) => e.toString())
+      .includes(user._id.toString());
+    const exist_p = game[0]
+      .toObject()
+      .postech_arr.map((e: any) => e.toString())
+      .includes(user._id.toString());
+    console.log(exist_k);
+    console.log(exist_p);
+    if (exist_k || exist_p) {
+      res.json({ success: false });
+    } else {
+      try {
+        await GameModel.update({ game_type }, { $addToSet: pushOption });
+        res.json({ success: true });
+      } catch (error) {
+        res.status(500).send(error);
+      }
+    }
+  });
 });
 
 export default router;
