@@ -1,5 +1,6 @@
-import express, { Router } from 'express';
-import mongoose, { createConnection } from 'mongoose';
+import express, { Express, Router } from 'express';
+import session from 'express-session';
+import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -16,6 +17,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useFindAndModify: false });
 declare module 'express-serve-static-core' {
   interface Request {
     decoded: JwtDecodedInfo;
+    session: Express.Session & { state: string };
   }
 }
 
@@ -24,8 +26,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.set('trust proxy', 1); // necessary for secure cookie
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SECRET || 'keyboard cat',
+    cookie: { secure: true, maxAge: 60000 }
+  })
+);
 app.use(morgan('combined'));
-
 app.use('/', router);
 
 db.initGames();
