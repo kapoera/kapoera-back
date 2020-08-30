@@ -7,7 +7,7 @@ import { GameType, GameModel, gameType } from './game';
 export function readUser(
   mail: string
 ): mongoose.DocumentQuery<UserType[], UserType> {
-  return UserModel.findOne({ mail });
+  return UserModel.find({ mail });
 }
 
 export function createUser(input: LoginInput): Promise<UserType> {
