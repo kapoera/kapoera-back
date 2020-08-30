@@ -1,4 +1,5 @@
 import express from 'express';
+import querystring from 'querystring';
 import { Tokens, LoginInput } from '../utils/type';
 import * as jwtUtils from '../utils/jwt';
 import * as authUtils from '../utils/auth';
@@ -44,6 +45,20 @@ router.post('/login', (req: express.Request, res: express.Response) => {
         });
     }
   });
+});
+
+router.post('/login-sso', (req: express.Request, res: express.Response) => {
+  const state = Date.now().toString();
+  req.session.state = state;
+
+  const qs = querystring.stringify({
+    client_id: process.env.SSO_CLIENT_ID,
+    state,
+    redirect_url: 'https://cyberkapo20.site/login/callback'
+  });
+  const url = `https://iam2.kaist.ac.kr/api/sso/commonLogin?${qs}`;
+
+  res.json({ url });
 });
 
 router.post('/token', (req: express.Request, res: express.Response) => {
