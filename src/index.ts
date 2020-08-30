@@ -3,6 +3,7 @@ import session from 'express-session';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import router from '../routes';
 import { JwtDecodedInfo } from '../utils/type';
@@ -17,7 +18,9 @@ mongoose.connect(uri, { useNewUrlParser: true, useFindAndModify: false });
 declare module 'express-serve-static-core' {
   interface Request {
     decoded: JwtDecodedInfo;
-    session: Express.Session & { state: string };
+    session: Express.Session & {
+      state: string;
+    };
   }
 }
 
@@ -35,6 +38,7 @@ app.use(
     cookie: { secure: true, maxAge: 60000 }
   })
 );
+app.use(cookieParser());
 app.use(morgan('combined'));
 app.use('/', router);
 
