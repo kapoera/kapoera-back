@@ -61,23 +61,4 @@ router.post('/login-sso', (req: express.Request, res: express.Response) => {
   res.json({ url });
 });
 
-router.post('/token', (req: express.Request, res: express.Response) => {
-  if (!req.headers.refreshtoken) {
-    res.json({ success: false, message: 'no refresh token' });
-  } else {
-    if (db.existRefreshToken(<string>req.headers.refreshtoken)) {
-      console.log('re-token-exist');
-      authUtils
-        .tokenVerify(<string>req.headers.refreshtoken)
-        .then(authUtils.revokeToken)
-        .then(token => {
-          res.json({ success: true, accessToken: token });
-        })
-        .catch(err => res.json({ success: false, message: err.message }));
-    } else {
-      res.json({ success: false, message: 'not appropriate token' });
-    }
-  }
-});
-
 export default router;
