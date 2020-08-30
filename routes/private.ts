@@ -8,18 +8,16 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get('/check', (req: express.Request, res: express.Response) => {
-  db.readUser(req.decoded.username)
-    .then(users => {
-      const { __v, password, ...userinfo } = users[0].toObject();
-      res.json({
-        success: true,
-        userinfo
-      });
-    })
-    .catch(err => {
-      res.json({ success: false, message: err.message });
-    });
+router.get('/check', async (req: express.Request, res: express.Response) => {
+  const { mail } = req.decoded;
+  try {
+    const userinfo = await UserModel.findOne({ mail });
+    if (userinfo === null) throw Error('User not found');
+
+    res.json({ success: true, userinfo });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
 });
 
 router.post(
