@@ -1,4 +1,4 @@
-import express, { Express, Router } from 'express';
+import express from 'express';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import morgan from 'morgan';

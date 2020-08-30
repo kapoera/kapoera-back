@@ -1,9 +1,5 @@
 import express from 'express';
 import querystring from 'querystring';
-import { Tokens, LoginInput } from '../utils/type';
-import * as jwtUtils from '../utils/jwt';
-import * as authUtils from '../utils/auth';
-import * as db from '../src/models/db';
 
 const router = express.Router();
 
