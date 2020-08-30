@@ -1,13 +1,12 @@
 import jwt from 'jsonwebtoken';
 import * as db from '../src/models/db';
-import { secretObj } from '../config/secret';
 import { Tokens } from './type';
 
-export const createAccessToken = (username: string): Promise<string> => {
+export const createAccessToken = (mail: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      { username },
-      secretObj.secret,
+      { mail },
+      process.env.JWT_SECRET || 'keyboard cat',
       { expiresIn: '15m', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
@@ -17,11 +16,11 @@ export const createAccessToken = (username: string): Promise<string> => {
   });
 };
 
-export const createRefreshToken = (username: string): Promise<string> => {
+export const createRefreshToken = (mail: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      { username },
-      secretObj.secret,
+      { mail },
+      process.env.JWT_SECRET || 'keyboard cat',
       { expiresIn: '14d', algorithm: 'HS256' },
       (err, token) => {
         if (err) reject(err);
@@ -31,11 +30,11 @@ export const createRefreshToken = (username: string): Promise<string> => {
   });
 };
 
-export const createTokens = (username: string): Promise<Tokens> => {
+export const createTokens = (mail: string): Promise<Tokens> => {
   return new Promise((resolve, reject) => {
-    createAccessToken(username)
+    createAccessToken(mail)
       .then(accessToken => {
-        createRefreshToken(username)
+        createRefreshToken(mail)
           .then(refreshToken => {
             db.addRefreshToken(refreshToken);
             resolve(<Tokens>{

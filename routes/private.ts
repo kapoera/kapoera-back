@@ -8,24 +8,23 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get('/check', (req: express.Request, res: express.Response) => {
-  db.readUser(req.decoded.username)
-    .then(users => {
-      const { __v, password, ...userinfo } = users[0].toObject();
-      res.json({
-        success: true,
-        userinfo
-      });
-    })
-    .catch(err => {
-      res.json({ success: false, message: err.message });
-    });
+router.get('/check', async (req: express.Request, res: express.Response) => {
+  const { mail } = req.decoded;
+  try {
+    const user = await UserModel.findOne({ mail });
+    if (user === null) throw Error('User not found');
+    const { __v, _id, ...userinfo } = user.toObject();
+
+    res.json({ success: true, userinfo });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
 });
 
 router.post(
   '/nickname',
   async (req: express.Request, res: express.Response) => {
-    const { username } = req.decoded;
+    const { mail } = req.decoded;
     const { nickname } = req.body;
 
     const exists = await UserModel.exists({ nickname });
@@ -33,7 +32,7 @@ router.post(
       res.json({ success: false, message: 'nickname taken' });
     } else {
       try {
-        await UserModel.findOneAndUpdate({ username }, { nickname });
+        await UserModel.findOneAndUpdate({ mail }, { nickname });
         res.json({ success: true });
       } catch (error) {
         res.json({ success: false, message: error.message });
@@ -43,10 +42,10 @@ router.post(
 );
 
 router.post('/bet', async (req: express.Request, res: express.Response) => {
-  const { username } = req.decoded;
+  const { mail } = req.decoded;
   const { game_type, choice } = req.body;
 
-  const user = await UserModel.findOne({ username });
+  const user = await UserModel.findOne({ mail });
   if (user === null) return res.status(400).send('User does not exist');
 
   const pushOption = {

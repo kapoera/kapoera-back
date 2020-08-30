@@ -5,9 +5,9 @@ import { RefreshTokenType, RefreshTokenModel } from './token';
 import { GameType, GameModel, gameType } from './game';
 
 export function readUser(
-  username: string
+  mail: string
 ): mongoose.DocumentQuery<UserType[], UserType> {
-  return UserModel.find({ username: username });
+  return UserModel.find({ mail });
 }
 
 export function createUser(input: LoginInput): Promise<UserType> {
@@ -23,12 +23,12 @@ export function createUser(input: LoginInput): Promise<UserType> {
   return u.save();
 }
 
-export function updateNickname(
-  user: User,
-  nickname: string
-): mongoose.Query<number> {
-  return UserModel.update({ username: user.username }, { nickname: nickname });
-}
+// export function updateNickname(
+//   user: User,
+//   nickname: string
+// ): mongoose.Query<number> {
+//   return UserModel.update({ username: user.username }, { nickname: nickname });
+// }
 
 export function addRefreshToken(token: string): Promise<RefreshTokenType> {
   const t = new RefreshTokenModel({ refreshToken: token });
