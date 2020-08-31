@@ -49,6 +49,7 @@ app.use(morgan('combined'));
 app.use('/', router);
 
 db.initGames();
+db.initEvents();
 app.listen(3000, () => console.log('http server start'));
 
 const socketApp = express();

@@ -3,6 +3,7 @@ import { LoginInput } from '../../utils/type';
 import { User, UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
 import { GameType, GameModel, gameType } from './game';
+import { EventType, EventModel } from './event';
 
 export function readUser(
   mail: string
@@ -49,7 +50,7 @@ function createGame(game_type: string, dividend: number): Promise<GameType> {
 
 export async function initGames(): Promise<void> {
   if (await GameModel.exists({})) {
-    console.log('already initialized');
+    console.log('already initialized - games');
     return;
   }
   const games = [
@@ -61,6 +62,51 @@ export async function initGames(): Promise<void> {
   ];
   games.forEach(game => {
     createGame(game.game_type, game.dividend);
+  });
+}
+
+async function createEvent(
+  game_type: string,
+  answer: string,
+  choices: Array<string>
+): Promise<EventType> {
+  const e = new EventModel({
+    game_type: <gameType>game_type,
+    answer: answer,
+    choices: choices
+  });
+
+  return e.save();
+}
+
+async function initializeEvent(e: any) {
+  const game_type = e.game_type;
+  await GameModel.update({ game_type }, { $addToSet: { subevents: e._id } });
+}
+
+export async function initEvents(): Promise<void> {
+  if (await EventModel.exists({})) {
+    console.log('already initialized - events');
+    return;
+  }
+  const events = [
+    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
+    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] }
+  ];
+  events.forEach(event => {
+    createEvent(event.game_type, event.answer, event.choices).then(
+      event_model => {
+        initializeEvent(event_model);
+      }
+    );
   });
 }
 
