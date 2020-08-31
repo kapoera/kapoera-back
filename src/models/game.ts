@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export type gameType = 'quiz' | 'hacking' | 'ai' | 'lol' | 'cart';
+export type gameType = 'quiz' | 'hacking' | 'ai' | 'lol' | 'kart';
 type playingType = 'waiting' | 'running' | 'exiting';
 type winnerType = 'K' | 'P';
 type resultType = {
