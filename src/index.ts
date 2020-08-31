@@ -1,14 +1,17 @@
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import connectRedis from 'connect-redis';
+import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
+import Redis from 'ioredis';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+import SocketIo from 'socket.io';
+
 import router from '../routes';
 import { JwtDecodedInfo } from '../utils/type';
 import * as db from './models/db';
-import SocketIo from 'socket.io';
 import socketEvents from './socket';
 
 dotenv.config();
@@ -25,6 +28,8 @@ declare module 'express-serve-static-core' {
 }
 
 const app = express();
+const RedisStore = connectRedis(session);
+const redisClient = new Redis();
 
 app.use(cors());
 app.use(express.json());
@@ -35,6 +40,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     secret: process.env.SESSION_SECRET || 'keyboard cat',
+    store: new RedisStore({ client: redisClient }),
     cookie: { secure: true, maxAge: 60000 }
   })
 );
