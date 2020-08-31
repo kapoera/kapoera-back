@@ -30,10 +30,10 @@ router.post(
     }: { body: SSOResult } = req;
 
     if (success !== 'true')
-      return res.status(500).send('Kaist SSO login failed');
+      return res.redirect('https://cyberkapo20.site?error=fail');
 
     if (!req.session.state || req.session.state !== state)
-      return res.status(401).send('TOKEN MISMATCH: session might be hijacked!');
+      return res.redirect('https://cyberkapo20.site?error=state');
 
     const key = process.env.SSO_CLIENT_SECRET + req.session.state;
 
