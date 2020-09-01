@@ -11,26 +11,6 @@ export function readUser(
   return UserModel.find({ mail });
 }
 
-export function createUser(input: LoginInput): Promise<UserType> {
-  const def = {
-    score: 500,
-    is_admin: false,
-    department: 'CS',
-    student_number: 12345678,
-    nickname: 'happyhappy'
-  };
-  const user = { ...def, ...input };
-  const u = new UserModel(user);
-  return u.save();
-}
-
-// export function updateNickname(
-//   user: User,
-//   nickname: string
-// ): mongoose.Query<number> {
-//   return UserModel.update({ username: user.username }, { nickname: nickname });
-// }
-
 export function addRefreshToken(token: string): Promise<RefreshTokenType> {
   const t = new RefreshTokenModel({ refreshToken: token });
   return t.save();
