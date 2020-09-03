@@ -67,13 +67,13 @@ export async function initGames(): Promise<void> {
 
 async function createEvent(
   game_type: string,
-  answer: string,
-  choices: Array<string>
+  choices: Array<string>,
+  name: string
 ): Promise<EventType> {
   const e = new EventModel({
     game_type: <gameType>game_type,
-    answer: answer,
-    choices: choices
+    choices: choices,
+    name: name
   });
 
   return e.save();
@@ -90,19 +90,19 @@ export async function initEvents(): Promise<void> {
     return;
   }
   const events = [
-    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] }
+{ game_type: 'quiz', choices: ['a', 'b', 'c', 'd', 'e'], name: 'quiz-a' },
+{ game_type: 'quiz', choices: ['a', 'b', 'c', 'd', 'e'], name: 'quiz-b' },
+{ game_type: 'hacking', choices: ['a', 'b', 'c', 'd', 'e'], name: 'hacking-a' },
+{ game_type: 'hacking', choices: ['a', 'b', 'c', 'd', 'e'], name: 'hacking-b' },
+{ game_type: 'ai', choices: ['a', 'b', 'c', 'd', 'e'], name: 'ai-a' },
+{ game_type: 'ai', choices: ['a', 'b', 'c', 'd', 'e'], name: 'ai-b' },
+{ game_type: 'lol', choices: ['a', 'b', 'c', 'd', 'e'], name: 'lol-a' },
+{ game_type: 'lol', choices: ['a', 'b', 'c', 'd', 'e'], name: 'lol-b' },
+{ game_type: 'kart', choices: ['a', 'b', 'c', 'd', 'e'], name: 'kart-a' },
+{ game_type: 'kart', choices: ['a', 'b', 'c', 'd', 'e'], name: 'kart-b' }
   ];
   events.forEach(event => {
-    createEvent(event.game_type, event.answer, event.choices).then(
+    createEvent(event.game_type, event.choices, event.name).then(
       event_model => {
         initializeEvent(event_model);
       }
@@ -119,3 +119,10 @@ export function readGame(
 ): mongoose.DocumentQuery<GameType[], GameType> {
   return GameModel.find({ game_type: game_type });
 }
+
+export function readEvent(
+  game_type: gameType
+): mongoose.DocumentQuery<EventType[], EventType> {
+  return EventModel.find({ game_type: game_type });
+}
+
