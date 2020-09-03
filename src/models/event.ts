@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { gameType } from './game';
 export interface Response {
   choice: string;
-  key: mongoose.Schema.Types.ObjectId;
+  key: string;
 }
 
 export interface Event {
@@ -11,6 +11,7 @@ export interface Event {
   choices: Array<string>;
   responses: Array<Response>;
   name: string;
+  key: number;
 }
 
 export type EventType = Event & mongoose.Document;
@@ -20,7 +21,8 @@ const EventSchema = new mongoose.Schema({
   answer: { type: String },
   choices: { type: [String], required: true },
   responses: { type: [{} as Response], default: [] },
-  name: { type: String, required: true }
+  name: { type: String, required: true },
+  key: { type: Number, required: true, unique: true }
 });
 
 export const EventModel = mongoose.model<EventType>('Event', EventSchema);
