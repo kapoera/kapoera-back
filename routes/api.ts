@@ -46,13 +46,13 @@ router.get(
     const { limit = 5 } = req.query;
 
     try {
-      const ranking = await UserModel.aggregate([
+      const rankings = await UserModel.aggregate([
         { $project: { nickname: 1, score: 1, _id: 0 } },
         { $sort: { score: -1 } },
         { $limit: limit }
       ]);
 
-      res.json({ success: true, ranking });
+      res.json({ success: true, rankings });
     } catch (error) {
       res.json({ success: false });
     }
