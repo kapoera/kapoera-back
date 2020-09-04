@@ -43,13 +43,13 @@ router.get(
 router.get(
   '/rankings/top',
   async (req: express.Request, res: express.Response) => {
-    const { limit = 5 } = req.query;
+    const limit: string = (req.query.limit as string) || '5';
 
     try {
       const rankings = await UserModel.aggregate([
         { $project: { nickname: 1, score: 1, _id: 0 } },
         { $sort: { score: -1 } },
-        { $limit: limit }
+        { $limit: parseInt(limit) }
       ]);
 
       res.json({ success: true, rankings });
