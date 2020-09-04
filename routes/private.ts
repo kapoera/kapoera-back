@@ -116,7 +116,7 @@ router.get(
       const user = await UserModel.findOne({ mail });
       if (user === null) throw Error('User not found');
 
-      const ranking = await UserModel.count({ score: { $gt: user.score } });
+      const ranking = await UserModel.count({ score: { $gt: user.score } }) + 1;
 
       res.json({
         success: true,
