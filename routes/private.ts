@@ -85,6 +85,13 @@ router.post('/betevent', async (req: express.Request, res: express.Response) => 
     key: mail
   }
   console.log(pushOption)
+  await db.readEventWithKey(<number>key).then(event => {
+    console.log(event[0].responses.map(res => res.key).includes(mail))
+    if(event[0].responses.map(res => res.key).includes(mail)){
+      return res.json({success: false})
+    }
+  }).catch(err =>
+    res.json({success: false}))
 
   try {
     await EventModel.update({ key }, { $addToSet: { responses: pushOption } });
