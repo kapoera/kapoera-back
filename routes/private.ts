@@ -62,8 +62,6 @@ router.post('/bet', async (req: express.Request, res: express.Response) => {
       .toObject()
       .postech_arr.map((e: any) => e.toString())
       .includes(user._id.toString());
-    console.log(exist_k);
-    console.log(exist_p);
     if (exist_k || exist_p) {
       res.json({ success: false });
     } else {
@@ -84,9 +82,7 @@ router.post('/betevent', async (req: express.Request, res: express.Response) => 
     choice: choice,
     key: mail
   }
-  console.log(pushOption)
   await db.readEventWithKey(<number>key).then( async (event) => {
-    console.log(event[0].responses.map(res => res.key).includes(mail))
     if(event[0].responses.map(res => res.key).includes(mail)){
       return res.json({success: false})
     }
@@ -101,5 +97,36 @@ router.post('/betevent', async (req: express.Request, res: express.Response) => 
   }).catch(err =>
     res.json({success: false}))
   });
+
+router.get(
+  '/rankings/top',
+  async (req: express.Request, res: express.Response) => {
+    const limit: number = parseInt(req.query.limit as string) || 5;
+    const {
+      decoded: { mail }
+    } = req;
+
+    try {
+      const rankings = await UserModel.aggregate([
+        { $project: { mail: 1, nickname: 1, score: 1, _id: 0 } },
+        { $sort: { score: -1 } },
+        { $limit: limit }
+      ]);
+
+      const user = await UserModel.findOne({ mail });
+      if (user === null) throw Error('User not found');
+
+      const ranking = await UserModel.count({ score: { $gt: user.score } });
+
+      res.json({
+        success: true,
+        rankings,
+        user: { score: user.score, ranking }
+      });
+    } catch (error) {
+      res.json({ success: false });
+    }
+  }
+);
 
 export default router;
