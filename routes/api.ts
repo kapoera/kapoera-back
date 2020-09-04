@@ -28,4 +28,15 @@ router.get(
   }
 );
 
+router.get(
+'/events/:gameType', async (req: express.Request, res: express.Response) => {
+  console.log(req.params.gameType)
+  await db.readEvent(<gameType>req.params.gameType)
+  .then(events => {
+    res.json(events.map(event => event.toObject()))
+  })
+  .catch(err => {
+    res.json({ message: err.message });
+  });
+})
 export default router;

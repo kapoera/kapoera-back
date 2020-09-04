@@ -3,6 +3,7 @@ import { authMiddleware } from '../middlewares/auth';
 import * as db from '../src/models/db';
 import { UserModel } from '../src/models/user';
 import { GameModel, gameType } from '../src/models/game';
+import { Response, Event, EventModel } from '../src/models/event';
 
 const router = express.Router();
 
@@ -74,6 +75,30 @@ router.post('/bet', async (req: express.Request, res: express.Response) => {
       }
     }
   });
+});
+
+router.post('/betevent', async (req: express.Request, res: express.Response) => {
+  const { mail } = req.decoded;
+  const { key, choice } = req.body;
+  const pushOption: Response = {
+    choice: choice,
+    key: mail
+  }
+  console.log(pushOption)
+  await db.readEventWithKey(<number>key).then(event => {
+    console.log(event[0].responses.map(res => res.key).includes(mail))
+    if(event[0].responses.map(res => res.key).includes(mail)){
+      return res.json({success: false})
+    }
+  }).catch(err =>
+    res.json({success: false}))
+
+  try {
+    await EventModel.update({ key }, { $addToSet: { responses: pushOption } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 export default router;

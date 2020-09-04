@@ -67,13 +67,15 @@ export async function initGames(): Promise<void> {
 
 async function createEvent(
   game_type: string,
-  answer: string,
-  choices: Array<string>
+  choices: Array<string>,
+  name: string,
+  idx: number
 ): Promise<EventType> {
   const e = new EventModel({
     game_type: <gameType>game_type,
-    answer: answer,
-    choices: choices
+    choices: choices,
+    name: name,
+    key: idx
   });
 
   return e.save();
@@ -90,19 +92,17 @@ export async function initEvents(): Promise<void> {
     return;
   }
   const events = [
-    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'quiz', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'hacking', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'ai', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'lol', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] },
-    { game_type: 'kart', answer: 'a', choices: ['a', 'b', 'c', 'd', 'e'] }
+    { game_type: 'quiz', choices: ['Kaist', 'Postech'], name: '화학 3번 문제를 맞추는 학교는 어디일까?' },
+    { game_type: 'hacking', choices: ['a', 'b', 'c', 'd', 'e'], name: 'hacking-a' },
+    { game_type: 'hacking', choices: ['a', 'b', 'c', 'd', 'e'], name: 'hacking-b' },
+{ game_type: 'ai', choices: ['5:0', '4:1', '3:2', '2:3', '1:4', '0:5'], name: 'AI경기가 몇대 몇으로 끝날까?' },
+    { game_type: 'lol', choices: ['화염', '바다', '대지', '바람'], name: '첫번쨰 용의 원소는?' },
+    { game_type: 'lol', choices: ['앞으로 팀탓 안함', '춘정박', 'Dont give up ToT', 'broke boys', 'nobonobo'], name: '첫번째 킬을 할 선수는?' },
+    { game_type: 'kart', choices: ['김동준', '곽채현', '정채현', '엄윤식'], name: '3등으로 들어오는 선수는?' },
+    { game_type: 'kart', choices: ['0~3', '4~7', '8~11', '12~15', '16~19'], name: '1등으로 들어온 선수가 사용한 부스터 갯수' }
   ];
-  events.forEach(event => {
-    createEvent(event.game_type, event.answer, event.choices).then(
+  events.forEach((event,idx) => {
+    createEvent(event.game_type, event.choices, event.name, idx).then(
       event_model => {
         initializeEvent(event_model);
       }
@@ -119,3 +119,15 @@ export function readGame(
 ): mongoose.DocumentQuery<GameType[], GameType> {
   return GameModel.find({ game_type: game_type });
 }
+
+export function readEvent(
+  game_type: gameType
+): mongoose.DocumentQuery<EventType[], EventType> {
+  return EventModel.find({ game_type: game_type });
+}
+export function readEventWithKey(
+  key: number
+): mongoose.DocumentQuery<EventType[], EventType> {
+return EventModel.find({ key: key });
+}
+
