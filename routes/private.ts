@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
-router.use('/admin', adminRouter)
+router.use('/admin', adminRouter);
 
 router.get('/check', async (req: express.Request, res: express.Response) => {
   const { mail } = req.decoded;
@@ -78,28 +78,35 @@ router.post('/bet', async (req: express.Request, res: express.Response) => {
   });
 });
 
-router.post('/betevent', async (req: express.Request, res: express.Response) => {
-  const { mail } = req.decoded;
-  const { key, choice } = req.body;
-  const pushOption: Response = {
-    choice: choice,
-    key: mail
+router.post(
+  '/betevent',
+  async (req: express.Request, res: express.Response) => {
+    const { mail } = req.decoded;
+    const { key, choice } = req.body;
+    const pushOption: Response = {
+      choice: choice,
+      key: mail
+    };
+    await db
+      .readEventWithKey(<number>key)
+      .then(async event => {
+        if (event[0].responses.map(res => res.key).includes(mail)) {
+          return res.json({ success: false });
+        } else {
+          try {
+            await EventModel.update(
+              { key },
+              { $addToSet: { responses: pushOption } }
+            );
+            res.json({ success: true });
+          } catch (error) {
+            res.status(500).send(error);
+          }
+        }
+      })
+      .catch(err => res.json({ success: false }));
   }
-  await db.readEventWithKey(<number>key).then( async (event) => {
-    if(event[0].responses.map(res => res.key).includes(mail)){
-      return res.json({success: false})
-    }
-    else{
-      try {
-        await EventModel.update({ key }, { $addToSet: { responses: pushOption } });
-        res.json({ success: true });
-      } catch (error) {
-        res.status(500).send(error);
-      }
-    }
-  }).catch(err =>
-    res.json({success: false}))
-  });
+);
 
 router.get(
   '/rankings/top',
@@ -119,7 +126,8 @@ router.get(
       const user = await UserModel.findOne({ mail });
       if (user === null) throw Error('User not found');
 
-      const ranking = await UserModel.count({ score: { $gt: user.score } }) + 1;
+      const ranking =
+        (await UserModel.count({ score: { $gt: user.score } })) + 1;
 
       res.json({
         success: true,
