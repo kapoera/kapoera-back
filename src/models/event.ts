@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { gameType } from './game';
 export interface Response {
   choice: string;
-  key: string;
+  key: mongoose.Schema.Types.ObjectId;
 }
 
 export interface Event {

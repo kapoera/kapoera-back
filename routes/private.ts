@@ -83,14 +83,17 @@ router.post(
   async (req: express.Request, res: express.Response) => {
     const { mail } = req.decoded;
     const { key, choice } = req.body;
+
+    const user = await UserModel.findOne({ mail });
+    if (user === null) return res.status(400).send('User does not exist');
     const pushOption: Response = {
       choice: choice,
-      key: mail
+      key: user._id
     };
     await db
       .readEventWithKey(<number>key)
       .then(async event => {
-        if (event[0].responses.map(res => res.key).includes(mail)) {
+        if (event[0].responses.map(res => res.key).includes(user._id)) {
           return res.json({ success: false });
         } else {
           try {
@@ -104,7 +107,7 @@ router.post(
           }
         }
       })
-      .catch(err => res.json({ success: false }));
+      .catch(err => res.json({ success: false, message: err.message }));
   }
 );
 

@@ -40,6 +40,7 @@ router.post(
     const { winner, game_type } = req.body;
     if (winner) {
       try {
+        await GameModel.findOneAndUpdate({ game_type }, { winner });
         await GameModel.findOne({ game_type }).then(async game => {
           if (game === null) res.json({ success: false });
           else {
