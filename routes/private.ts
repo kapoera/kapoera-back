@@ -4,10 +4,13 @@ import * as db from '../src/models/db';
 import { UserModel } from '../src/models/user';
 import { GameModel, gameType } from '../src/models/game';
 import { Response, Event, EventModel } from '../src/models/event';
+import adminRouter from './admin';
 
 const router = express.Router();
 
 router.use(authMiddleware);
+
+router.use('/admin', adminRouter)
 
 router.get('/check', async (req: express.Request, res: express.Response) => {
   const { mail } = req.decoded;

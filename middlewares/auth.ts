@@ -56,3 +56,23 @@ export function authMiddleware(
       .catch(onError);
   }
 }
+
+export function adminMiddleware(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+): void {
+  const { mail } = req.decoded
+
+  try{
+    const user = await UserModel.findOne({ mail });
+    if (user === null) return res.status(400).send('User does not exist');
+    else if (!user.is_admin) return res.status(400).send('User is not admin');
+    else next()
+  } catch (error) {
+    res.status(500).send(error);
+  }
+})
+
+
+
