@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 import { JwtDecodedInfo } from '../utils/type';
 import { createAccessToken } from '../utils/jwt';
+import { UserModel } from '../src/models/user';
 
 export function authMiddleware(
   req: express.Request,
@@ -54,5 +55,24 @@ export function authMiddleware(
         next();
       })
       .catch(onError);
+  }
+}
+
+export async function adminMiddleware(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+): Promise<void> {
+  const { mail } = req.decoded;
+
+  try {
+    const user = await UserModel.findOne({ mail });
+    if (user === null) res.status(400).send('User does not exist');
+    else if (!user.is_admin) res.status(400).send('User is not admin');
+    else {
+      next();
+    }
+  } catch (error) {
+    res.status(500).send(error);
   }
 }

@@ -30,15 +30,18 @@ router.get(
 );
 
 router.get(
-  '/events/:gameType', async (req: express.Request, res: express.Response) => {
-    await db.readEvent(<gameType>req.params.gameType)
+  '/events/:gameType',
+  async (req: express.Request, res: express.Response) => {
+    await db
+      .readEvent(<gameType>req.params.gameType)
       .then(events => {
-        res.json(events.map(event => event.toObject()))
+        res.json(events.map(event => event.toObject()));
       })
       .catch(err => {
         res.json({ message: err.message });
       });
-})
+  }
+);
 
 router.get(
   '/rankings/top',

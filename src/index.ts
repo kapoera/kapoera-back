@@ -31,7 +31,7 @@ const app = express();
 const RedisStore = connectRedis(session);
 const redisClient = new Redis();
 
-app.use(cors());
+app.use(cors({ origin: 'http://aria.sparcs.org:32970', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.set('trust proxy', 1); // necessary for secure cookie

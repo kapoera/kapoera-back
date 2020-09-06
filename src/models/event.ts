@@ -2,10 +2,11 @@ import mongoose from 'mongoose';
 import { gameType } from './game';
 export interface Response {
   choice: string;
-  key: string;
+  key: mongoose.Schema.Types.ObjectId;
 }
 
 export interface Event {
+  dividend: number;
   game_type: gameType;
   answer: string;
   choices: Array<string>;
@@ -17,6 +18,7 @@ export interface Event {
 export type EventType = Event & mongoose.Document;
 
 const EventSchema = new mongoose.Schema({
+  dividend: { type: Number, required: true },
   game_type: { type: {} as gameType, required: true },
   answer: { type: String },
   choices: { type: [String], required: true },
