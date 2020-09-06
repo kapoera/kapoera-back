@@ -9,6 +9,9 @@ const router = express.Router();
 
 router.use(adminMiddleware);
 
+router.post('/check', (req: express.Request, res: express.Response) => {
+  res.json({success: true})
+})
 router.post('/score', async (req: express.Request, res: express.Response) => {
   const { result, game_type } = req.body;
 
