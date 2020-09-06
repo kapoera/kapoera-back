@@ -95,6 +95,7 @@ router.post(
   '/betevent',
   async (req: express.Request, res: express.Response) => {
     const { mail } = req.decoded;
+
     const { key, choice, game_type } = req.body;
 
     const user = await UserModel.findOne({ mail });
