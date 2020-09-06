@@ -1,4 +1,5 @@
 import express from 'express';
+import cryptoRandomString from 'crypto-random-string';
 import authRouter from './auth';
 import apiRouter from './api';
 import crypto from 'crypto';
@@ -54,7 +55,22 @@ router.post(
     try {
       const { accessToken, refreshToken } = await JWTUtils.createTokens(mail);
       const exists = await UserModel.exists({ mail });
-      const nickname = mail.substring(0, mail.length - '@kaist.ac.kr'.length);
+
+      const base = mail.substring(0, mail.length - '@kaist.ac.kr'.length);
+      const candidates = (
+        await UserModel.find({
+          nickname: { $regex: `^${base}` }
+        })
+      ).map(record => record.nickname);
+
+      let nickname = base;
+      while (candidates.includes(nickname)) {
+        const randomString = cryptoRandomString({
+          length: 4,
+          type: 'distinguishable'
+        }).toLowerCase();
+        nickname = `${base}-${randomString}`;
+      }
 
       if (!exists) {
         const defaults = {
