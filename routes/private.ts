@@ -17,7 +17,7 @@ router.get('/check', async (req: express.Request, res: express.Response) => {
   try {
     const user = await UserModel.findOne({ mail });
     if (user === null) throw Error('User not found');
-    const { __v, _id, ...userinfo } = user.toObject();
+    const { __v, ...userinfo } = user.toObject();
 
     res.json({ success: true, userinfo });
   } catch (error) {
