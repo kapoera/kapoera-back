@@ -64,15 +64,15 @@ router.post(
       ).map(record => record.nickname);
 
       let nickname = base;
-      while (candidates.includes(nickname)) {
-        const randomString = cryptoRandomString({
-          length: 4,
-          type: 'distinguishable'
-        }).toLowerCase();
-        nickname = `${base}-${randomString}`;
-      }
-
       if (!exists) {
+        while (candidates.includes(nickname)) {
+          const randomString = cryptoRandomString({
+            length: 4,
+            type: 'distinguishable'
+          }).toLowerCase();
+          nickname = `${base}-${randomString}`;
+        }
+
         const defaults = {
           score: 0,
           is_admin: false,
