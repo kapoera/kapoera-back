@@ -31,6 +31,10 @@ router.post(
     const { mail } = req.decoded;
     const { nickname } = req.body;
 
+    if (!(0 < nickname.length && nickname.length <= 10)) {
+      return res.json({ success: false, message: 'invalid nickname length' });
+    }
+
     const exists = await UserModel.exists({ nickname });
     if (exists) {
       res.json({ success: false, message: 'nickname taken' });
