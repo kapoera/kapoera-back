@@ -4,6 +4,7 @@ import { User, UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
 import { GameType, GameModel, gameType } from './game';
 import { EventType, EventModel } from './event';
+import events from './events';
 
 export function readUser(
   mail: string
@@ -68,15 +69,17 @@ export async function initGames(): Promise<void> {
 async function createEvent(
   game_type: string,
   choices: Array<string>,
-  name: string,
+  name_ko: string,
+  name_en: string,
   dividend: number,
   idx: number
 ): Promise<EventType> {
   const e = new EventModel({
     game_type: <gameType>game_type,
-    choices: choices,
-    name: name,
-    dividend: dividend,
+    choices,
+    name_ko,
+    name_en,
+    dividend,
     key: idx
   });
 
@@ -93,67 +96,13 @@ export async function initEvents(): Promise<void> {
     console.log('already initialized - events');
     return;
   }
-  const events = [
-    {
-      game_type: 'quiz',
-      choices: ['Kaist', 'Postech'],
-      name: '화학 3번 문제를 맞추는 학교는 어디일까?',
-      dividend: 500
-    },
-    {
-      game_type: 'hacking',
-      choices: ['a', 'b', 'c', 'd', 'e'],
-      name: 'hacking-a',
-      dividend: 500
-    },
-    {
-      game_type: 'hacking',
-      choices: ['a', 'b', 'c', 'd', 'e'],
-      name: 'hacking-b',
-      dividend: 500
-    },
-    {
-      game_type: 'ai',
-      choices: ['5:0', '4:1', '3:2', '2:3', '1:4', '0:5'],
-      name: 'AI경기가 몇대 몇으로 끝날까?',
-      dividend: 500
-    },
-    {
-      game_type: 'lol',
-      choices: ['화염', '바다', '대지', '바람'],
-      name: '첫번쨰 용의 원소는?',
-      dividend: 500
-    },
-    {
-      game_type: 'lol',
-      choices: [
-        '앞으로 팀탓 안함',
-        '춘정박',
-        'Dont give up ToT',
-        'broke boys',
-        'nobonobo'
-      ],
-      name: '첫번째 킬을 할 선수는?',
-      dividend: 500
-    },
-    {
-      game_type: 'kart',
-      choices: ['김동준', '곽채현', '정채현', '엄윤식'],
-      name: '3등으로 들어오는 선수는?',
-      dividend: 500
-    },
-    {
-      game_type: 'kart',
-      choices: ['0~3', '4~7', '8~11', '12~15', '16~19'],
-      name: '1등으로 들어온 선수가 사용한 부스터 갯수',
-      dividend: 500
-    }
-  ];
+
   events.forEach((event, idx) => {
     createEvent(
       event.game_type,
       event.choices,
-      event.name,
+      event.name_ko,
+      event.name_en,
       event.dividend,
       idx
     ).then(event_model => {
