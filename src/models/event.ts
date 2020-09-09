@@ -11,7 +11,8 @@ export interface Event {
   answer: string;
   choices: Array<string>;
   responses: Array<Response>;
-  name: string;
+  name_ko: string;
+  name_en: string;
   key: number;
 }
 
@@ -23,7 +24,8 @@ const EventSchema = new mongoose.Schema({
   answer: { type: String },
   choices: { type: [String], required: true },
   responses: { type: [{} as Response], default: [] },
-  name: { type: String, required: true },
+  name_ko: { type: String, required: true },
+  name_en: { type: String, required: true },
   key: { type: Number, required: true, unique: true }
 });
 

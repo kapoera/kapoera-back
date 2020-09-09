@@ -145,3 +145,4 @@ tags
 config
 
 build
+src/models/events.ts
