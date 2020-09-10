@@ -4,7 +4,8 @@ import { User, UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
 import { GameType, GameModel, gameType } from './game';
 import { EventType, EventModel } from './event';
-import events from './events';
+import events from './data/events';
+import games from './data/games';
 
 export function readUser(
   mail: string
@@ -54,13 +55,6 @@ export async function initGames(): Promise<void> {
     console.log('already initialized - games');
     return;
   }
-  const games = [
-    { game_type: 'quiz', dividend: 1000 },
-    { game_type: 'ai', dividend: 1000 },
-    { game_type: 'lol', dividend: 1000 },
-    { game_type: 'kart', dividend: 1000 },
-    { game_type: 'hacking', dividend: 1000 }
-  ];
   games.forEach(game => {
     createGame(game.game_type, game.dividend);
   });
