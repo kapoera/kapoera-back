@@ -39,7 +39,7 @@ const GameSchema = new mongoose.Schema({
   playing: { type: {} as playingType, default: 'waiting' },
   winner: { type: {} as winnerType, default: 'N' },
   result: { type: { K: Number, P: Number }, default: { K: 0, P: 0 } },
-  starting_time: { type: Date, default: Date.now() }
+  starting_time: { type: Date, default: Date.now }
 });
 
 export const GameModel = mongoose.model<GameType>('Game', GameSchema);

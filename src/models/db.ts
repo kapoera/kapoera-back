@@ -42,10 +42,11 @@ export function existRefreshToken(token: string): Promise<boolean> {
   return RefreshTokenModel.exists({ refreshToken: token });
 }
 
-function createGame(game_type: string, dividend: number): Promise<GameType> {
+function createGame(game_type: string, dividend: number, starting_time: Date): Promise<GameType> {
   const g = new GameModel({
-    dividend: dividend,
-    game_type: game_type
+    dividend,
+    game_type,
+    starting_time
   });
   return g.save();
 }
@@ -56,7 +57,7 @@ export async function initGames(): Promise<void> {
     return;
   }
   games.forEach(game => {
-    createGame(game.game_type, game.dividend);
+    createGame(game.game_type, game.dividend, game.starting_time);
   });
 }
 
