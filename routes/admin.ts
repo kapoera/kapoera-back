@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(adminMiddleware);
 
 router.post('/check', (req: express.Request, res: express.Response) => {
-  res.json({success: true})
+  res.json({ success: true })
 })
 router.post('/score', async (req: express.Request, res: express.Response) => {
   const { result, game_type } = req.body;
@@ -48,13 +48,13 @@ router.post(
           if (game === null) res.json({ success: false });
           else {
             if (winner === 'K') {
-              const scoreEach = game.dividend / game.kaist_arr.length;
+              const scoreEach = Math.round(game.dividend / game.kaist_arr.length);
               await UserModel.updateMany(
                 { _id: { $in: game.kaist_arr } },
                 { $inc: { score: scoreEach } }
               );
             } else if (winner === 'P') {
-              const scoreEach = game.dividend / game.postech_arr.length;
+              const scoreEach = Math.round(game.dividend / game.postech_arr.length);
               await UserModel.updateMany(
                 { _id: { $in: game.postech_arr } },
                 { $inc: { score: scoreEach } }
@@ -84,7 +84,7 @@ router.post(
               .filter(res => res.choice === answer)
               .map(res => res.key);
 
-            const scoreEach = event.dividend / correctUser.length;
+            const scoreEach = Math.round(event.dividend / correctUser.length);
             await UserModel.updateMany(
               { _id: { $in: correctUser } },
               { $inc: { score: scoreEach } }
