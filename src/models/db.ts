@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { LoginInput } from '../../utils/type';
-import { User, UserType, UserModel } from './user';
+import { GamesI, LoginInput } from '../../utils/type';
+import { UserType, UserModel } from './user';
 import { RefreshTokenType, RefreshTokenModel } from './token';
 import { GameType, GameModel, gameType } from './game';
 import { EventType, EventModel } from './event';
@@ -26,13 +26,6 @@ export function createUser(input: LoginInput): Promise<UserType> {
   return u.save();
 }
 
-// export function updateNickname(
-//   user: User,
-//   nickname: string
-// ): mongoose.Query<number> {
-//   return UserModel.update({ username: user.username }, { nickname: nickname });
-// }
-
 export function addRefreshToken(token: string): Promise<RefreshTokenType> {
   const t = new RefreshTokenModel({ refreshToken: token });
   return t.save();
@@ -42,12 +35,8 @@ export function existRefreshToken(token: string): Promise<boolean> {
   return RefreshTokenModel.exists({ refreshToken: token });
 }
 
-function createGame(game_type: string, dividend: number, starting_time: Date): Promise<GameType> {
-  const g = new GameModel({
-    dividend,
-    game_type,
-    starting_time
-  });
+function createGame(game: GamesI): Promise<GameType> {
+  const g = new GameModel(game);
   return g.save();
 }
 
@@ -56,9 +45,7 @@ export async function initGames(): Promise<void> {
     console.log('already initialized - games');
     return;
   }
-  games.forEach(game => {
-    createGame(game.game_type, game.dividend, game.starting_time);
-  });
+  games.forEach(game => createGame(game));
 }
 
 async function createEvent(
