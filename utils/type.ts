@@ -39,3 +39,22 @@ export interface SSODataMap {
   state: string;
   REDIRECT_URL: string;
 }
+
+export enum Winner {
+  KAIST = 'KAIST',
+  POSTECH = 'POSTECH'
+}
+
+export interface Record {
+  score: [number, number];
+  year: number;
+  winner: Winner;
+}
+
+export interface GamesI {
+  game_type: 'quiz' | 'ai' | 'lol' | 'kart' | 'hacking';
+  dividend: number;
+  starting_time: Date;
+  records: Record[];
+}
+
